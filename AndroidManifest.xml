@@ -13,6 +13,11 @@
         android:theme="@style/Theme.Paragon"
         tools:targetApi="31">
         <activity
+            android:name=".TakePicActivity"
+            android:exported="false"
+            android:label="@string/title_activity_take_pic"
+            android:theme="@style/Theme.Paragon" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
