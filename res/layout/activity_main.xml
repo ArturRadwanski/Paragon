@@ -25,6 +25,12 @@
             android:text="@string/scan"
             android:id="@+id/scanButton"
             />
+        <Button
+            android:layout_width="150sp"
+            android:layout_height="50sp"
+            android:text="@string/load"
+            android:id="@+id/loadButton"
+            />
 
     </LinearLayout>
 

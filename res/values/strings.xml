@@ -3,4 +3,6 @@
     <string name="scan">SCAN</string>
     <string name="settings">settings</string>
     <string name="title_activity_take_pic">TakePicActivity</string>
+    <string name="load">LOAD</string>
+    <string name="title_activity_load_pic">LoadPicActivity</string>
 </resources>
