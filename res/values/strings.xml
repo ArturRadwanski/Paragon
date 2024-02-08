@@ -5,4 +5,7 @@
     <string name="title_activity_take_pic">TakePicActivity</string>
     <string name="load">LOAD</string>
     <string name="title_activity_load_pic">LoadPicActivity</string>
+    <string name="alert_no_camera_permission">Camera access permission revoked, please allow app to capture images</string>
+    <string name="alert_no_camera_permission_title">Camera permission denied</string>
+    <string name="positive_button">OK</string>
 </resources>
