@@ -5,14 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TakePicActivity">
-<FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-   <TextureView
-       android:id="@+id/txtView"
+
+   <androidx.constraintlayout.widget.ConstraintLayout
        android:layout_width="match_parent"
-       android:layout_height="match_parent" />
-</FrameLayout>
+       android:layout_height="wrap_content"
+       android:layout_alignParentBottom="true"
+       android:layout_marginBottom="200dp">
+
+      <FrameLayout
+          android:layout_width="match_parent"
+          android:layout_height="0dp"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintDimensionRatio="1:1">
+
+         <TextureView
+             android:id="@+id/txtView"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent" />
+      </FrameLayout>
+   </androidx.constraintlayout.widget.ConstraintLayout>
+
 
    <Button
        android:layout_width="wrap_content"

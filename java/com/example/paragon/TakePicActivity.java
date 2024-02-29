@@ -3,6 +3,8 @@ package com.example.paragon;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.impl.utils.CompareSizesByArea;
 import androidx.camera.core.internal.CameraUseCaseAdapter;
 import androidx.camera.lifecycle.ProcessCameraProvider;
@@ -21,10 +23,14 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.InputConfiguration;
+import android.hardware.camera2.params.OutputConfiguration;
+import android.hardware.camera2.params.SessionConfiguration;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.MediaStore;
@@ -38,6 +44,7 @@ import android.view.View;
 import com.example.paragon.databinding.ActivityTakePicBinding;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +52,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 public class TakePicActivity extends AppCompatActivity {
     private ActivityTakePicBinding binding;
@@ -146,16 +154,6 @@ public class TakePicActivity extends AppCompatActivity {
                 }
 
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-                int deviceOrientation = getWindowManager().getDefaultDisplay().getOrientation();
-                int totalRotation = sensorToDeviceRotation(cameraCharacteristics, deviceOrientation);
-                boolean swapRotation = totalRotation == 90 || totalRotation == 270;
-                int rotatedWidth = width;
-                int rotatedHeight = height;
-                if(swapRotation){
-                    rotatedHeight = width;
-                    rotatedWidth = height;
-                }
-                mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class), rotatedWidth, rotatedHeight);
             }
         }
         catch(CameraAccessException e){
@@ -221,35 +219,44 @@ public class TakePicActivity extends AppCompatActivity {
     }
     @SuppressLint("MissingPermission")//cant enter this activity without permission
     private void handleButtonClick(View v){
-        try {
-            mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-        } catch (CameraAccessException e) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-                dialog.setMessage(R.string.alert_no_camera_permission);
-                dialog.setTitle(R.string.alert_no_camera_permission_title);
-                dialog.setPositiveButton(R.string.positive_button, new DialogInterface.OnClickListener() {
+        Executor ex = command -> {
+
+        };
+        String pathtoImage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath()+ "/Camera/IMG_20150521_144859.jpg";
+        File file = new File(pathtoImage);
+        ImageCapture.OutputFileOptions options = new ImageCapture.OutputFileOptions.Builder(file).build();
+        new ImageCapture.Builder()
+                .build().takePicture(options, ex, new ImageCapture.OnImageSavedCallback() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        return;
+                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(TakePicActivity.this);
+                          dialog.setMessage("Pomślnie zrobiono zdjęcie");
+                          dialog.setTitle("Zdjęcie");
+                          dialog.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                              @Override
+                              public void onClick(DialogInterface dialog, int which) {
+                                  return;
+                              }
+                          });
+                        dialog.show();
+                    }
+
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(TakePicActivity.this);
+                        dialog.setMessage(exception.getMessage());
+                        dialog.setTitle("Error");
+                        dialog.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        });
+                        dialog.show();
                     }
                 });
-                AlertDialog alt = dialog.create();
-                alt.show();
-        }
-    }
-    private static Size chooseOptimalSize(Size[] choices, int width, int height){
-        List<Size> bigEnough = new ArrayList<Size>();
-        for(Size option : choices) {
-            if(option.getHeight() == option.getWidth() * height / width &&
-            option.getWidth() >= width && option.getHeight() >= height) {
-                bigEnough.add(option);
-            }
-        }
-        if(bigEnough.size() >= 0) {
-            Size min = Collections.min(bigEnough, new CompareSizesByArea());
-            return min;
-        } else {
-            return choices[0];
-        }
+//            mCameraDevice.createCaptureSession(new SessionConfiguration(SessionConfiguration.SESSION_REGULAR, ));
+//            mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE).build();
+
     }
 }
